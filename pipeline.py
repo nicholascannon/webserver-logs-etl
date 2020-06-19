@@ -51,6 +51,7 @@ def transform_log_dict(log):
     # remove uneeded entries
     del log['ClientAddr']
     del log['StartLocal']
+    del log['StartUTC']
     del log['time']
 
     return log

@@ -55,7 +55,6 @@ def provision(uri, log_path):
                         Column('ServiceUrlRawPath', Text),
                         Column('ServiceUrlRawQuery', Text),
                         Column('ServiceUrlFragment', Text),
-                        Column('StartUTC', sa.DateTime),
                         Column('entryPointName', String(10)),
                         Column('level', String(10)),
                         Column('msg', Text))
