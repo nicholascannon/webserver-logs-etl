@@ -40,17 +40,18 @@ def transform_log_dict(log):
     log['ds'] = log['time']
 
     # service url transformation
-    serviceUrl = log['ServiceURL']
-    log['ServiceUrlPath'] = serviceUrl['Path']
-    log['ServiceUrlRawPath'] = serviceUrl['RawPath']
-    log['ServiceUrlRawQuery'] = serviceUrl['RawQuery']
-    log['ServiceUrlFragment'] = serviceUrl['Fragment']
+    serviceUrl = log.get('ServiceURL')
+    if serviceUrl:
+        log['ServiceUrlPath'] = serviceUrl['Path']
+        log['ServiceUrlRawPath'] = serviceUrl['RawPath']
+        log['ServiceUrlRawQuery'] = serviceUrl['RawQuery']
+        log['ServiceUrlFragment'] = serviceUrl['Fragment']
+        del log['ServiceURL']
 
     # remove uneeded entries
     del log['ClientAddr']
     del log['StartLocal']
     del log['time']
-    del log['ServiceURL']
 
     return log
 

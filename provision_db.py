@@ -12,7 +12,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 DB_URI = os.environ.get('DB_URI') or 'sqlite:///db.sqlite'
-LOG_PATH = os.environ.get('LOG_PATH') or './data/access-dev.json'
+LOG_PATH = os.environ.get('LOG_PATH') or './data/access-logs.json'
 
 
 def provision(uri, log_path):
