@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 #
-# Batch data pipeline to ingest web server logs into staging table directly
-# from log file. Raw logs are ingested with a datestamp so other pipelines can
-# run jobs by date.
-#
-# This pipeline is designed to be run quite frequentely to avoid large batch
-# sizes being ingested.
+# Batch data pipeline to ingest web server logs into data warehouse table from
+# log file. Persists position in the log file.
 #
 # Written by Nicholas Cannon
 import sqlalchemy as sa
@@ -39,7 +35,27 @@ def setup(uri):
         logging.exception('Setup Error!')
 
 
-def load_raw_batch(uri, pos, log_file):
+def transform_log_dict(log):
+    """Transform and clean log dict"""
+    log['ds'] = log['time']
+
+    # service url transformation
+    serviceUrl = log['ServiceURL']
+    log['ServiceUrlPath'] = serviceUrl['Path']
+    log['ServiceUrlRawPath'] = serviceUrl['RawPath']
+    log['ServiceUrlRawQuery'] = serviceUrl['RawQuery']
+    log['ServiceUrlFragment'] = serviceUrl['Fragment']
+
+    # remove uneeded entries
+    del log['ClientAddr']
+    del log['StartLocal']
+    del log['time']
+    del log['ServiceURL']
+
+    return log
+
+
+def load_batch(uri, pos, log_file):
     """
     Open log file and ingest raw batch into staging table. Doesn't ingest by
     datestamp but instead ingests all new data from logfile.
@@ -73,19 +89,24 @@ def load_raw_batch(uri, pos, log_file):
 
         bytes_read = pos
         with engine.connect() as conn:
-            q = 'INSERT INTO logs_staged (ds, log) VALUES (:ds, :log);'
             with open(log_file, 'r') as f:
                 f.seek(pos)
 
-                # PROCESS LINES
+                # PROCESS LOGS
                 pbar = tqdm(position=pos, total=file_size - pos)
                 while bytes_read < file_size:
                     line = f.readline()
 
                     # check blank / empty lines
                     if len(line) != 0 and line.strip() != '':
-                        ds = json.loads(line).get('time')
-                        conn.execute(q, {'ds': ds, 'log': line})
+                        log = transform_log_dict(json.loads(line))
+
+                        # format dict into templated query for SQLAlchemy
+                        # would be better to format this outside of the for loop.
+                        q = 'INSERT INTO logs ({}) VALUES ({});'.format(
+                            ', '.join(log.keys()),
+                            ', '.join([':' + k for k in log.keys()]))
+                        conn.execute(q, **log)
 
                     line_bytes = len(line.encode())
                     pbar.update(line_bytes)
@@ -106,6 +127,8 @@ def load_raw_batch(uri, pos, log_file):
 
 
 if __name__ == "__main__":
+    logging.info('Running pipeline with DB: {}'.format(DB_URI))
+
     # RUN PIPELINE
     pos, log_file = setup(DB_URI)
-    load_raw_batch(DB_URI, pos, log_file)
+    load_batch(DB_URI, pos, log_file)

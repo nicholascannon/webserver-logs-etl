@@ -12,7 +12,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 DB_URI = os.environ.get('DB_URI') or 'sqlite:///db.sqlite'
-LOG_PATH = os.environ.get('LOG_PATH') or './data/access-logs.json'
+LOG_PATH = os.environ.get('LOG_PATH') or './data/access-dev.json'
 
 
 def provision(uri, log_path):
@@ -24,11 +24,6 @@ def provision(uri, log_path):
         engine = sa.create_engine(uri)
         meta = sa.MetaData(bind=engine)
         logging.info('Connected to {}'.format(uri))
-
-        logs_stage = sa.Table('logs_staged', meta,
-                              Column('id', Integer, primary_key=True),
-                              Column('ds', sa.Date, nullable=False),
-                              Column('log', sa.JSON))
 
         logs = sa.Table('logs', meta,
                         Column('id', Integer, primary_key=True),
