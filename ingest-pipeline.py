@@ -4,6 +4,9 @@
 # from log file. Raw logs are ingested with a datestamp so other pipelines can
 # run jobs by date.
 #
+# This pipeline is designed to be run quite frequentely to avoid large batch
+# sizes being ingested.
+#
 # Written by Nicholas Cannon
 import sqlalchemy as sa
 import logging
@@ -13,7 +16,7 @@ from tqdm import tqdm
 
 logging.basicConfig(level=logging.INFO)
 
-DB_URI = 'sqlite:///db.sqlite'
+DB_URI = os.environ.get('DB_URI') or 'sqlite:///db.sqlite'
 
 
 def setup(uri):
@@ -41,6 +44,7 @@ def load_raw_batch(uri, pos, log_file):
     Open log file and ingest raw batch into staging table. Doesn't ingest by
     datestamp but instead ingests all new data from logfile.
     """
+    # SETUP
     try:
         # check valid log file
         if not os.path.exists(log_file):
