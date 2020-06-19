@@ -1,2 +1,3 @@
 data/access-logs.json
 data/error-logs.json
+db.sqlite
