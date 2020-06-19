@@ -1,3 +1,4 @@
 data/access-logs.json
 data/error-logs.json
+data/access-dev.json
 db.sqlite
