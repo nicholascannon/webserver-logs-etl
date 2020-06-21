@@ -42,6 +42,7 @@ def transform_log_dict(log):
     # service url transformation
     serviceUrl = log.get('ServiceURL')
     if serviceUrl:
+        log['ServiceScheme'] = serviceUrl['ServiceScheme']
         log['ServiceUrlPath'] = serviceUrl['Path']
         log['ServiceUrlRawPath'] = serviceUrl['RawPath']
         log['ServiceUrlRawQuery'] = serviceUrl['RawQuery']
