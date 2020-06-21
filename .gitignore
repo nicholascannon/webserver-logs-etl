@@ -1,4 +1,5 @@
 data/access-logs.json
 data/error-logs.json
 data/access-dev.json
+.ipynb_checkpoints
 db.sqlite
