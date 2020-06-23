@@ -8,3 +8,21 @@ Pure Python data pipeline for ingesting my webserver logs from my [portfolio web
 2. Set the environment variables `DB_URI` and `LOG_PATH` which correspond to the database uri that you want to ingest into and the path to the Traefik log file respectively.
 3. Run the `provision_db.py` file to setup the database tables required for the pipeline.
 4. Run the `pipeline.py` on a `CRON` schedule.
+
+## Analyis
+
+![req_day](plots/requests-per-day.png)
+
+![router_traffic](plots/router-traffic.png)
+
+![spoofed_host](plots/spoofed-host-traffic.png)
+
+Had a lot of traffic from this spoofed host.
+
+![web_router](plots/web-router-traffic.png)
+
+![traffic_method](plots/traffic-vs-method.png)
+
+![traffic_protocol](plots/traffic-vs-protocol.png)
+
+![traffic_paths](plots/traffic-vs-top-paths.png)
